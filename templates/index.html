@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CecyVive - Portal de Eventos CECYTEM Tenango del Valle</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cecy: {
+                            dark: '#004d25',      // Verde Oscuro
+                            DEFAULT: '#006837',   // Verde CECYTEM Principal
+                            light: '#008a48',    // Verde Medio
+                            accent: '#8cc63f',   // Verde Lima / Uniforme
+                            soft: '#f0fdf4',     // Fondo suave
+                            gold: '#d97706',     // Acento secundario
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #006837; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen">
+
+    <header class="bg-cecy-dark text-white shadow-lg sticky top-0 z-40 border-b-4 border-cecy-accent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Branding -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('inicio')">
+                    <div class="bg-white text-cecy p-2.5 rounded-2xl shadow-md flex items-center justify-center border border-cecy-accent">
+                        <i class="fa-solid fa-cat text-2xl text-cecy"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-display font-black text-2xl tracking-tight text-white">Cecy<span class="text-cecy-accent">Vive</span></span>
+                            <span class="bg-cecy-accent text-cecy-dark text-[10px] font-black px-1.5 py-0.5 rounded uppercase">Jaguar</span>
+                        </div>
+                        <span class="text-xs text-emerald-200 font-medium block">CECYTEM Plantel Tenango del Valle</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden lg:flex space-x-1">
+                    <button onclick="switchTab('inicio')" id="nav-inicio" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 text-cecy-accent bg-cecy-light/30">
+                        <i class="fa-solid fa-house text-xs"></i> Inicio
+                    </button>
+                    <button onclick="switchTab('calendario')" id="nav-calendario" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-days text-xs"></i> Calendario
+                    </button>
+                    <button onclick="switchTab('eventos')" id="nav-eventos" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-xs"></i> Eventos
+                    </button>
+                    <button onclick="switchTab('avisos')" id="nav-avisos" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-bullhorn text-xs"></i> Avisos
+                    </button>
+                    <button onclick="switchTab('galeria')" id="nav-galeria" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-xs"></i> Galería
+                    </button>
+                    <button onclick="switchTab('registro-evento')" id="nav-registro-evento" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-list text-xs"></i> Inscribirse a Evento
+                    </button>
+                    <button onclick="switchTab('inscripcion')" id="nav-inscripcion" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold hover:bg-cecy-light/50 text-emerald-100 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-xs"></i> Registro Usuario
+                    </button>
+                    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-3 py-2 rounded-xl text-sm font-semibold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-400/30 transition-colors flex items-center gap-2 ml-2">
+                        <i class="fa-solid fa-user-shield text-xs"></i> Admin
+                    </button>
+                </nav>
+
+                <!-- Mobile Button -->
+                <div class="lg:hidden flex items-center">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-white hover:text-cecy-accent p-2 rounded-md">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-cecy-dark border-t border-cecy-light px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('inicio'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-house w-5 text-cecy-accent"></i> Inicio
+            </button>
+            <button onclick="switchTab('calendario'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-calendar-days w-5 text-cecy-accent"></i> Calendario Escolar
+            </button>
+            <button onclick="switchTab('eventos'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-trophy w-5 text-cecy-accent"></i> Eventos y Talleres
+            </button>
+            <button onclick="switchTab('inscripcion'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-user-plus w-5 text-cecy-accent"></i> Registro de Usuario
+            </button>
+            <button onclick="switchTab('registro-evento'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-clipboard-list w-5 text-cecy-accent"></i> Inscribirse a Evento
+            </button>
+            <button onclick="switchTab('avisos'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-bullhorn w-5 text-cecy-accent"></i> Avisos del Plantel
+            </button>
+            <button onclick="switchTab('galeria'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-emerald-100 hover:bg-cecy flex items-center gap-3">
+                <i class="fa-solid fa-camera w-5 text-cecy-accent"></i> Galería CecyVive
+            </button>
+            <button onclick="switchTab('admin'); toggleMobileMenu()" class="w-full text-left px-3 py-2.5 rounded-lg text-base font-medium text-amber-300 bg-amber-500/20 flex items-center gap-3 mt-2">
+                <i class="fa-solid fa-user-shield w-5"></i> Administrador
+            </button>
+        </div>
+    </header>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- INICIO -->
+        <section id="tab-inicio" class="tab-content active space-y-8">
+            <div class="relative bg-gradient-to-br from-cecy-dark via-cecy to-cecy-light text-white rounded-3xl p-8 sm:p-12 overflow-hidden shadow-xl border border-emerald-800">
+                <div class="absolute right-0 bottom-0 opacity-10 font-display font-black text-9xl text-white select-none pointer-events-none leading-none -mb-10 -mr-10">
+                    CECYTEM
+                </div>
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 text-emerald-200 text-xs font-bold rounded-full mb-4">
+                        <i class="fa-solid fa-award text-cecy-accent"></i> CecyVive • Orgullo Jaguar Tenango del Valle
+                    </div>
+                    <h1 class="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white mb-4">
+                        Bienvenido al Portal de Eventos de CECYTEM Tenango del Valle
+                    </h1>
+                    <p class="text-emerald-100 text-base sm:text-lg mb-8 leading-relaxed font-normal">
+                        Concentramos en un solo lugar toda la información sobre concursos académicos, encuentros deportivos, talleres tecnológicos y eventos culturales. Consulta fechas y regístrate en directo.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="switchTab('eventos')" class="bg-cecy-accent hover:bg-lime-500 text-cecy-dark font-black px-6 py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                            Explorar Eventos Disponibles <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                        <button onclick="switchTab('inscripcion')" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-emerald-200"></i> Registro de Estudiantes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between hover:border-cecy-accent transition-colors">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 bg-emerald-100 text-cecy rounded-2xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-lg text-slate-900">Calendario Escolar</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Visualiza las fechas clave, jornadas deportivas, concursos de ciencia y tecnología, así como los eventos semestrales organizados en el plantel.
+                        </p>
+                    </div>
+                    <button onclick="switchTab('calendario')" class="mt-4 text-xs font-extrabold text-cecy hover:text-cecy-dark flex items-center gap-1.5">
+                        Consultar Calendario <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between hover:border-cecy-accent transition-colors">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 bg-emerald-100 text-cecy rounded-2xl flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-lg text-slate-900">Comunicados del Plantel</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Entérate de avisos urgentes emitidos por la dirección, requisitos de uniformes y galerías fotográficas con momentos destacados de los alumnos.
+                        </p>
+                    </div>
+                    <button onclick="switchTab('avisos')" class="mt-4 text-xs font-extrabold text-cecy hover:text-cecy-dark flex items-center gap-1.5">
+                        Ver Avisos Oficiales <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-display text-2xl font-bold text-slate-900">Próximos Eventos Destacados</h2>
+                        <p class="text-slate-500 text-sm">Actividades abiertas para estudiantes, docentes y la comunidad escolar</p>
+                    </div>
+                    <button onclick="switchTab('eventos')" class="text-cecy font-bold text-sm hover:underline flex items-center gap-1">
+                        Ver catálogo completo <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="home-featured-events">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-emerald-900 to-cecy text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md border border-cecy-accent/30">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-white/20">
+                        <i class="fa-solid fa-bullhorn text-3xl text-cecy-accent"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold text-cecy-accent uppercase tracking-wider">Último Aviso del Plantel</span>
+                        <h3 class="font-display font-bold text-lg text-white mt-0.5" id="home-notice-title">Cargando aviso...</h3>
+                        <p class="text-emerald-100 text-xs sm:text-sm mt-1" id="home-latest-notice">Cargando mensaje...</p>
+                    </div>
+                </div>
+                <button onclick="switchTab('avisos')" class="bg-cecy-accent hover:bg-lime-400 text-cecy-dark font-black text-xs px-5 py-3 rounded-xl whitespace-nowrap shadow transition-colors">
+                    Ver Tablón Completo
+                </button>
+            </div>
+        </section>
+
+        <!-- CALENDARIO -->
+        <section id="tab-calendario" class="tab-content space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900">Calendario Escolar Tenango del Valle</h2>
+                    <p class="text-slate-500 text-sm">Fechas programadas para torneos, talleres y convocatorias</p>
+                </div>
+                <div class="flex flex-wrap gap-2" id="calendar-filter-buttons">
+                    <button onclick="filterCalendar('todos')" class="calendar-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-cecy text-white shadow-sm" data-cat="todos">Todos</button>
+                    <button onclick="filterCalendar('Academico')" class="calendar-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Academico">Académico / TICs</button>
+                    <button onclick="filterCalendar('Deportivo')" class="calendar-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Deportivo">Deportes Jaguar</button>
+                    <button onclick="filterCalendar('Cultural')" class="calendar-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Cultural">Cultural</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-cecy-dark text-white flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-regular fa-calendar-check text-xl text-cecy-accent"></i>
+                        <h3 class="font-display text-lg font-bold" id="calendar-month-year">Octubre 2026</h3>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-cecy rounded-lg text-emerald-100 transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="resetCalendarToToday()" class="px-3 py-1 bg-cecy hover:bg-cecy-light text-xs font-bold rounded-lg text-white">
+                            Hoy
+                        </button>
+                        <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-cecy rounded-lg text-emerald-100 transition-colors">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-xs font-extrabold text-slate-600 py-3">
+                    <div>DOM</div><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div>SÁB</div>
+                </div>
+
+                <div class="grid grid-cols-7 text-sm divide-x divide-y divide-slate-100 min-h-[420px]" id="calendar-cells">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <div id="calendar-selected-day-details" class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 hidden">
+                <h4 class="text-sm font-bold text-cecy mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-clock"></i> Actividades del CECYTEM para la fecha seleccionada:
+                </h4>
+                <div id="calendar-day-events-list" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- EVENTOS -->
+        <section id="tab-eventos" class="tab-content space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900">Eventos y Convocatorias Escolares</h2>
+                    <p class="text-slate-500 text-sm">Participa en representación de tu grupo o especialidad técnica</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative min-w-[240px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="event-search-input" oninput="applyEventFilters()" placeholder="Buscar evento..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cecy">
+                    </div>
+                    <select id="event-category-select" onchange="applyEventFilters()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cecy font-medium text-slate-700">
+                        <option value="todos">Todas las categorías</option>
+                        <option value="Academico">Académico</option>
+                        <option value="Deportivo">Deportivo</option>
+                        <option value="Cultural">Cultural</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="events-grid-container">
+                <!-- Dynamic rendering -->
+            </div>
+        </section>
+
+        <!-- 1. FORMULARIO DE REGISTRO DE ESTUDIANTES (Solo Usuario) -->
+        <section id="tab-inscripcion" class="tab-content">
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- VISTA 1: Formulario con selector entre Login y Registro -->
+                <div id="user-register-view" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                    
+                    <!-- Selector Superior de Modo -->
+                    <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-6">
+                        <button id="btn-mode-login" type="button" onclick="toggleAuthMode('login')" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-white text-cecy shadow-sm">
+                            <i class="fa-solid fa-right-to-bracket mr-2"></i>Iniciar Sesión
+                        </button>
+                        <button id="btn-mode-register" type="button" onclick="toggleAuthMode('register')" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-slate-900">
+                            <i class="fa-solid fa-user-plus mr-2"></i>Registrarse
+                        </button>
+                    </div>
+
+                    <!-- FORMULARIO 1: Iniciar Sesión por Matrícula -->
+                    <form id="form-login-estudiante" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                        <div class="text-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 text-cecy rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl shadow-inner">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                            </div>
+                            <h3 class="font-display text-xl font-bold text-slate-900">Bienvenido a CecyVive</h3>
+                            <p class="text-xs text-slate-500">Ingresa tu matrícula para acceder a tu perfil y eventos</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Matrícula CECYTEM *</label>
+                            <input type="text" id="login-matricula" required placeholder="Ej. 24415082320174" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none font-mono">
+                        </div>
+                        <button type="submit" class="w-full bg-cecy hover:bg-cecy-dark text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-right-to-bracket"></i> Entrar a Mi Perfil
+                        </button>
+                    </form>
+
+                    <!-- FORMULARIO 2: Registro de Nuevo Estudiante -->
+                    <form id="student-registration-form" onsubmit="handleStudentRegistrationSubmit(event)" class="space-y-4 hidden">
+                        <div class="text-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 text-cecy rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl shadow-inner">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <h2 class="font-display text-xl font-bold text-slate-900">Registro de Estudiante</h2>
+                            <p class="text-slate-500 text-xs mt-1">Crea tu cuenta única para poder inscribirte a los eventos del plantel</p>
+                        </div>
+                    
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Nombre Completo *</label>
+                                <input type="text" id="reg-name" required placeholder="Ej. Karen Brito" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Matrícula CECYTEM *</label>
+                                <input type="text" id="reg-matricula" required placeholder="Ej. 24415082320174" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none font-mono">
+                            </div>
+                        </div>
+                    
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Carrera *</label>
+                                <select id="reg-carrera" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none font-medium">
+                                    <option value="Programacion">Programación</option>
+                                    <option value="Soporte">Soporte y Mantenimiento</option>
+                                    <option value="Administracion">Administración</option>
+                                    <option value="Contabilidad">Contabilidad</option>
+                                    <option value="Logistica">Logística</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Grupo / Semestre *</label>
+                                <input type="text" id="reg-grupo" required placeholder="Ej. 502" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                            </div>
+                        </div>
+                    
+                        <div>
+                            <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">Correo Electrónico *</label>
+                            <input type="email" id="reg-correo" required placeholder="ejemplo@soycecytem.mx" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                        </div>
+                    
+                        <div class="pt-2">
+                            <button type="submit" class="w-full bg-cecy hover:bg-cecy-dark text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-base">
+                                <i class="fa-solid fa-user-check text-cecy-accent"></i> Registrarme y Ver Mi Perfil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            
+                <!-- VISTA 2: Perfil Único del Usuario Activo -->
+                <div id="user-profile-view" class="hidden space-y-6">
+                    <div class="bg-gradient-to-br from-cecy-dark via-cecy to-cecy-light text-white rounded-3xl p-6 sm:p-8 shadow-md border border-emerald-800">
+                        <div class="flex items-center justify-between border-b border-white/20 pb-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-white text-cecy rounded-2xl flex items-center justify-center font-bold text-xl">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-display font-bold text-xl text-white" id="my-profile-name">-</h3>
+                                    <span class="text-xs text-emerald-200 font-mono" id="my-profile-matricula">Matrícula: -</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-cecy-accent text-cecy-dark px-3 py-1 rounded-full text-xs font-black uppercase" id="my-profile-id">ID: #0</span>
+                                <button onclick="logoutUser()" title="Cerrar sesión" class="bg-rose-500/80 hover:bg-rose-600 text-white p-2 rounded-xl text-xs transition-colors flex items-center justify-center">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </button>
+                            </div>
+                        </div>
+                    
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <span class="text-emerald-200 block mb-1">Carrera</span>
+                                <span class="font-bold text-sm text-white" id="my-profile-carrera">-</span>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <span class="text-emerald-200 block mb-1">Grupo / Semestre</span>
+                                <span class="font-bold text-sm text-white" id="my-profile-grupo">-</span>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <span class="text-emerald-200 block mb-1">Correo Institucional</span>
+                                <span class="font-bold text-xs text-white truncate block" id="my-profile-correo">-</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Lista Única de Mis Eventos Inscritos -->
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-display text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-trophy text-cecy"></i> Mis Eventos Inscritos
+                            </h3>
+                            <button onclick="switchTab('eventos')" class="text-xs bg-cecy text-white font-bold px-3 py-1.5 rounded-xl hover:bg-cecy-dark transition-colors">
+                                <i class="fa-solid fa-plus text-xs mr-1"></i> Explorar Más Eventos
+                            </button>
+                        </div>
+                    
+                        <div id="my-assigned-events-grid" class="space-y-3">
+                            <!-- Los eventos del usuario se insertan dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+        </section>
+
+        <!-- 2. FORMULARIO DE INSCRIPCIÓN A EVENTO -->
+        <section id="tab-registro-evento" class="tab-content">
+            <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <div class="w-14 h-14 bg-emerald-100 text-cecy rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                        <i class="fa-solid fa-clipboard-list text-cecy"></i>
+                    </div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900">Inscripción a un Evento</h2>
+                    <p class="text-slate-500 text-xs sm:text-sm mt-1">Escribe el ID del usuario en la base de datos y el ID del evento para realizar la asignación</p>
+                </div>
+
+                <form id="event-assignment-form" onsubmit="handleEventAssignmentSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">ID del Usuario (Base de Datos) *</label>
+                        <input type="number" id="assign-user-id" required placeholder="Ej. 1, 2, 3..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">ID del Evento (id_E) *</label>
+                        <input type="number" id="assign-event-id" required placeholder="Ej. 1, 2, 3..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-cecy focus:outline-none font-mono">
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-cecy hover:bg-cecy-dark text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-base">
+                            <i class="fa-solid fa-trophy text-cecy-accent"></i> Inscribir al Evento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- AVISOS -->
+        <section id="tab-avisos" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-display text-2xl font-bold text-slate-900">Tablón de Avisos Oficiales</h2>
+                <p class="text-slate-500 text-sm">Comunicados de la dirección, trámites, becas y avisos generales</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="notices-container">
+                <!-- Dynamic rendering -->
+            </div>
+        </section>
+
+        <!-- GALERÍA (CORREGIDA) -->
+        <section id="tab-galeria" class="tab-content space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900">Galería de Momentos CecyVive</h2>
+                    <p class="text-slate-500 text-sm">Fotografías destacadas de actividades pasadas en el plantel</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterGallery('todos')" class="gallery-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-cecy text-white shadow-sm" data-cat="todos">Todas</button>
+                    <button onclick="filterGallery('Deportivo')" class="gallery-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Deportivo">Deportes</button>
+                    <button onclick="filterGallery('Academico')" class="gallery-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Academico">Tecnología / TICs</button>
+                    <button onclick="filterGallery('Cultural')" class="gallery-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-cat="Cultural">Cultural</button>
+                </div>
+            </div>
+
+            <!-- Contenedor alineado con script.js -->
+            <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se cargan dinámicamente los elementos de la galería -->
+            </div>
+        </section>
+
+        <!-- ADMIN -->
+        <section id="tab-admin" class="tab-content space-y-8">
+            <div id="admin-auth-card" class="max-w-md mx-auto bg-white rounded-3xl p-8 shadow-sm border border-slate-200 text-center space-y-4">
+                <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-display text-xl font-bold text-slate-900">Acceso Administrativo CecyVive</h3>
+                <p class="text-slate-500 text-xs">Ingresa la clave de control para gestionar eventos y lista de alumnos. <br><span class="text-cecy font-semibold">(Clave por defecto: cecytem2026)</span></p>
+
+                <form onsubmit="verifyAdminPass(event)" class="space-y-3">
+                    <input type="password" id="admin-password-input" placeholder="Clave de acceso" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center focus:ring-2 focus:ring-cecy focus:outline-none">
+                    <button type="submit" class="w-full bg-cecy hover:bg-cecy-dark text-white font-bold py-3 rounded-xl transition-colors text-sm shadow">
+                        Ingresar al Panel
+                    </button>
+                </form>
+            </div>
+
+            <div id="admin-main-content" class="hidden space-y-8">
+                <div class="bg-cecy-dark text-white rounded-3xl p-6 flex items-center justify-between flex-wrap gap-4 border border-cecy-accent/40 shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-white/10 text-cecy-accent rounded-2xl border border-white/20">
+                            <i class="fa-solid fa-user-shield text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-display text-xl font-bold text-white">Administración CECYTEM Tenango del Valle</h2>
+                            <p class="text-emerald-200 text-xs">Gestión centralizada de eventos, avisos e inscritos</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="lockAdmin()" class="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-2 rounded-xl transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Cerrar Sesión
+                        </button>
+                        <button onclick="resetDataToDefault()" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold px-3 py-2 rounded-xl border border-amber-400/30 transition-colors">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Restablecer Datos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex border-b border-slate-200 gap-6 text-sm font-bold">
+                    <button onclick="switchAdminSubtab('admin-events')" id="admin-tab-events-btn" class="admin-subtab-btn pb-3 border-b-2 border-cecy text-cecy flex items-center gap-2">
+                        <i class="fa-solid fa-square-plus"></i> Gestionar Eventos
+                    </button>
+                    <button onclick="switchAdminSubtab('admin-regs')" id="admin-tab-regs-btn" class="admin-subtab-btn pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-xs"></i> Alumnos Registrados (<span id="admin-total-regs-badge">0</span>)
+                    </button>
+                    <button onclick="switchAdminSubtab('admin-notices')" id="admin-tab-notices-btn" class="admin-subtab-btn pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-bullhorn text-xs"></i> Publicar Aviso
+                    </button>
+                </div>
+
+                <div id="subtab-admin-events" class="admin-subtab-content space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="font-display text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-cecy"></i> <span id="admin-event-form-title">Agregar Evento Escolar</span>
+                        </h3>
+                        <form id="admin-event-form" onsubmit="handleSaveEvent(event)" enctype="multipart/form-data" class="space-y-4">
+                            <input type="hidden" id="admin-event-id" value="">
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nombre del Evento (Nombre_E) *</label>
+                                    <input type="text" id="admin-event-title" name="Nombre_E" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Categoría *</label>
+                                    <select id="admin-event-category" name="categoria" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                        <option value="Academico">Académico</option>
+                                        <option value="Deportivo">Deportivo</option>
+                                        <option value="Cultural">Cultural</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cupo *</label>
+                                    <input type="number" id="admin-event-capacity" name="Cupo" required min="1" value="20" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Fecha (DATE) *</label>
+                                    <input type="date" id="admin-event-date" name="Fecha" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Hora (TIME) *</label>
+                                    <input type="time" id="admin-event-time" name="Hora" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Lugar *</label>
+                                    <input type="text" id="admin-event-location" name="Lugar" required placeholder="Ej. Biblioteca / Explanada" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Imagen del Evento (Para Galería / Cartel)</label>
+                                <input type="file" id="admin-event-image" name="imagen" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-cecy focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Descripción (`Desc`) *</label>
+                                <textarea id="admin-event-desc" name="Desc" rows="3" required placeholder="Detalles del evento..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none"></textarea>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-2">
+                                <button type="submit" class="bg-cecy hover:bg-cecy-dark text-white font-bold px-5 py-2.5 rounded-xl shadow transition-colors text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> Guardar Evento
+                                </button>
+                                <button type="button" onclick="cancelEventEdit()" id="admin-cancel-edit-btn" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-sm">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="font-display text-lg font-bold text-slate-900 mb-4">Tabla Evento</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 text-xs uppercase font-bold">
+                                    <tr>
+                                        <th class="p-3 rounded-l-xl">id_E</th>
+                                        <th class="p-3">Nombre_E</th>
+                                        <th class="p-3">Categoría</th>
+                                        <th class="p-3">Fecha y Hora</th>
+                                        <th class="p-3">Lugar</th>
+                                        <th class="p-3">Cupo</th>
+                                        <th class="p-3 text-right rounded-r-xl">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-events-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subtab-admin-regs" class="admin-subtab-content hidden space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-display text-lg font-bold text-slate-900">Tabla Estudiantes y Asignaciones</h3>
+                            <span class="bg-emerald-100 text-cecy px-3 py-1 rounded-full text-xs font-bold">
+                                Total: <span id="admin-student-count">0</span>
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[11px] font-extrabold uppercase text-slate-500 border-b border-slate-200">
+                                        <th class="p-3">ID</th>
+                                        <th class="p-3">Nombre</th>
+                                        <th class="p-3">Matrícula</th>
+                                        <th class="p-3">Carrera / Grupo</th>
+                                        <th class="p-3">Correo</th>
+                                        <th class="p-3">Eventos Asignados</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-students-tbody">
+                                    <!-- Se llena dinámicamente desde la BD -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subtab-admin-notices" class="admin-subtab-content hidden space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="font-display text-lg font-bold text-slate-900 mb-4">Publicar Aviso Escolar</h3>
+                        <form onsubmit="handleCreateAvisoSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Título del Comunicado *</label>
+                                <input type="text" id="admin-notice-title" required placeholder="Ej. Inicio del Torneo Intergrupos" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tipo de Aviso</label>
+                                    <select id="admin-notice-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                        <option value="Urgente">Urgente / Importante</option>
+                                        <option value="Informativo" selected>Informativo General</option>
+                                        <option value="Convocatoria">Convocatoria</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Emisor</label>
+                                    <input type="text" id="admin-notice-author" value="Dirección Plantel Tenango del Valle" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Mensaje *</label>
+                                <textarea id="admin-notice-content" rows="3" required placeholder="Detalles del aviso para la comunidad escolar..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-cecy focus:outline-none"></textarea>
+                            </div>
+                            <button type="submit" class="bg-cecy hover:bg-cecy-dark text-white font-bold px-5 py-2.5 rounded-xl shadow transition-colors text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-cecy-accent"></i> Publicar Aviso
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="relative max-w-4xl w-full" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white hover:text-emerald-300 text-3xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="Galería CecyVive" class="w-full max-h-[80vh] object-contain rounded-2xl">
+            <div class="mt-3 text-white text-center">
+                <h4 id="lightbox-title" class="font-display font-bold text-lg text-cecy-accent"></h4>
+                <p id="lightbox-desc" class="text-sm text-slate-300"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-cecy-dark border-t-4 border-cecy-accent text-emerald-100 py-8 mt-auto text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-white text-cecy rounded-lg flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-cat text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-display font-bold text-white text-base">CecyVive • CECYTEM Tenango del Valle</span>
+                    <p class="text-xs text-emerald-300">Colegio de Estudios Científicos y Tecnológicos del Estado de México</p>
+                </div>
+            </div>
+            <p class="text-xs text-emerald-300 text-center md:text-right">
+                © 2026 CECYTEM Tenango del Valle. Orgullo y Garra Jaguar.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Script externo de static -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
